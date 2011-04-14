@@ -19,6 +19,14 @@ NSString *const kXMLReaderTextNodeKey = @"text";
 #pragma mark -
 #pragma mark Public methods
 
++ (NSDictionary *)dictionaryForPath:(NSString *)path error:(NSError **)errorPointer {
+    NSString *fullpath = [[NSBundle mainBundle] pathForResource:path ofType:@"xml"];
+	NSData *data = [[NSFileManager defaultManager] contentsAtPath:fullpath];
+    NSDictionary *rootDictionary = [XMLReader dictionaryForXMLData:data error:errorPointer];
+
+	return rootDictionary;
+}
+
 + (NSDictionary *)dictionaryForXMLData:(NSData *)data error:(NSError **)error
 {
     XMLReader *reader = [[XMLReader alloc] initWithError:error];
@@ -38,7 +46,7 @@ NSString *const kXMLReaderTextNodeKey = @"text";
 
 - (id)initWithError:(NSError **)error
 {
-    if (self = [super init])
+    if ((self = [super init]))
     {
         errorPointer = error;
     }
@@ -68,6 +76,7 @@ NSString *const kXMLReaderTextNodeKey = @"text";
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
     parser.delegate = self;
     BOOL success = [parser parse];
+	[parser release];
     
     // Return the stack's root dictionary on success
     if (success)
@@ -132,21 +141,32 @@ NSString *const kXMLReaderTextNodeKey = @"text";
     // Set the text property
     if ([textInProgress length] > 0)
     {
-        [dictInProgress setObject:textInProgress forKey:kXMLReaderTextNodeKey];
+		if ([dictInProgress count] > 0) {
+			[dictInProgress setObject:textInProgress forKey:kXMLReaderTextNodeKey];
+			[dictionaryStack removeLastObject];
+		} else {
+			// Given that there will only ever be a single value in this dictionary, let's
+			// replace the dictionary with a simple string.
+			//
+			[dictionaryStack removeLastObject];
+			NSMutableDictionary *parentDict = [dictionaryStack lastObject];
+			[parentDict removeObjectForKey:elementName];
+			[parentDict setObject:textInProgress forKey:elementName];
+		}
 
         // Reset the text
         [textInProgress release];
         textInProgress = [[NSMutableString alloc] init];
+	} else {
+		// Pop the current dict
+		[dictionaryStack removeLastObject];
     }
-    
-    // Pop the current dict
-    [dictionaryStack removeLastObject];
 }
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
 {
     // Build the text value
-    [textInProgress appendString:string];
+	[textInProgress appendString:[string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
 }
 
 - (void)parser:(NSXMLParser *)parser parseErrorOccurred:(NSError *)parseError
