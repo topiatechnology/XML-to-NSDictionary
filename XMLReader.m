@@ -158,8 +158,18 @@ NSString *const kXMLReaderTextNodeKey = @"text";
         [textInProgress release];
         textInProgress = [[NSMutableString alloc] init];
 	} else {
-		// Pop the current dict
-		[dictionaryStack removeLastObject];
+		if ([dictInProgress count] > 0) {
+			// Pop the current dict
+			[dictionaryStack removeLastObject];
+		} else {
+			// If there was no value for the tag, and no attribute, then remove
+			// it from the dictionary.
+			//
+			[dictionaryStack removeLastObject];
+			NSMutableDictionary *parentDict = [dictionaryStack lastObject];
+			[parentDict removeObjectForKey:elementName];
+		}
+
     }
 }
 
