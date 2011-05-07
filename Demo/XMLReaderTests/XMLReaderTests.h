@@ -10,7 +10,6 @@
 
 @interface XMLReaderTests : SenTestCase
 {
-@private
     
 }
 
