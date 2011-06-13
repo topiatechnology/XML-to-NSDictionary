@@ -151,7 +151,7 @@ NSString *const kXMLReaderTextNodeKey = @"text";
     // Get the dictionary for the current level in the stack
     NSMutableDictionary *parentDict = [dictionaryStack lastObject];
     
-    // Create the child dictionary for the new element, and initilaize it with the attributes
+    // Create the child dictionary for the new element, and initialize it with the attributes
     NSMutableDictionary *childDict = [NSMutableDictionary dictionary];
     [childDict addEntriesFromDictionary:attributeDict];
     
@@ -195,42 +195,47 @@ NSString *const kXMLReaderTextNodeKey = @"text";
     // Update the parent dict with text info
     NSMutableDictionary *dictInProgress = [dictionaryStack lastObject];
     
+    // Pop the current dict
+    [dictionaryStack removeLastObject];
+    
     // Set the text property
     if ([textInProgress length] > 0)
     {
-		if ([dictInProgress count] > 0)
+        if ([dictInProgress count] > 0)
         {
-			[dictInProgress setObject:textInProgress forKey:kXMLReaderTextNodeKey];
-			[dictionaryStack removeLastObject];
-		}
+            [dictInProgress setObject:textInProgress forKey:kXMLReaderTextNodeKey];
+        }
         else
         {
-			// Given that there will only ever be a single value in this dictionary, let's replace the dictionary with a simple string.
-			[dictionaryStack removeLastObject];
-			NSMutableDictionary *parentDict = [dictionaryStack lastObject];
-			[parentDict removeObjectForKey:elementName];
-			[parentDict setObject:textInProgress forKey:elementName];
-		}
+            // Given that there will only ever be a single value in this dictionary, let's replace the dictionary with a simple string.
+            NSMutableDictionary *parentDict = [dictionaryStack lastObject];
+            id parentObject = [parentDict objectForKey:elementName];
+            
+            // Parent is an Array
+            if ([parentObject isKindOfClass:[NSArray class]])
+            {
+                [parentObject removeLastObject];
+                [parentObject addObject:textInProgress];
+            }
+            
+            // Parent is a Dictionary
+            else
+            {
+                [parentDict removeObjectForKey:elementName];
+                [parentDict setObject:textInProgress forKey:elementName];
+            }
+        }
         
         // Reset the text
         [textInProgress release];
         textInProgress = [[NSMutableString alloc] init];
-	}
-    else
+    }
+    
+    // If there was no value for the tag, and no attribute, then remove it from the dictionary.
+    else if ([dictInProgress count] == 0)
     {
-		if ([dictInProgress count] > 0)
-        {
-			// Pop the current dict
-			[dictionaryStack removeLastObject];
-		}
-        else
-        {
-			// If there was no value for the tag, and no attribute, then remove it from the dictionary.
-			[dictionaryStack removeLastObject];
-			NSMutableDictionary *parentDict = [dictionaryStack lastObject];
-			[parentDict removeObjectForKey:elementName];
-		}
-        
+        NSMutableDictionary *parentDict = [dictionaryStack lastObject];
+        [parentDict removeObjectForKey:elementName];
     }
 }
 
