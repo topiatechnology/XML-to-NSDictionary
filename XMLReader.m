@@ -151,9 +151,14 @@ NSString *const kXMLReaderTextNodeKey = @"text";
     // Get the dictionary for the current level in the stack
     NSMutableDictionary *parentDict = [dictionaryStack lastObject];
     
-    // Create the child dictionary for the new element, and initialize it with the attributes
+    // Create the child dictionary for the new element
     NSMutableDictionary *childDict = [NSMutableDictionary dictionary];
-    [childDict addEntriesFromDictionary:attributeDict];
+
+    // Initialize child dictionary with the attributes, prefixed with '@'
+    for (NSString *key in attributeDict) {
+        [childDict setValue:[attributeDict objectForKey:key]
+                     forKey:[NSString stringWithFormat:@"@%@", key]];
+    }
     
     // If there's already an item for this key, it means we need to create an array
     id existingValue = [parentDict objectForKey:elementName];
