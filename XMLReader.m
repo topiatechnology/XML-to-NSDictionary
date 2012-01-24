@@ -236,13 +236,6 @@ NSString *const kXMLReaderAttributePrefix = @"";
         [textInProgress release];
         textInProgress = [[NSMutableString alloc] init];
     }
-    
-    // If there was no value for the tag, and no attribute, then remove it from the dictionary.
-    else if ([dictInProgress count] == 0)
-    {
-        NSMutableDictionary *parentDict = [dictionaryStack lastObject];
-        [parentDict removeObjectForKey:elementName];
-    }
 }
 
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
