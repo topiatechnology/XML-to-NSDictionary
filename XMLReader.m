@@ -5,6 +5,7 @@
 #import "XMLReader.h"
 
 NSString *const kXMLReaderTextNodeKey = @"text";
+NSString *const kXMLReaderAttributePrefix = @"@";
 
 @interface XMLReader (Internal)
 
@@ -157,7 +158,7 @@ NSString *const kXMLReaderTextNodeKey = @"text";
     // Initialize child dictionary with the attributes, prefixed with '@'
     for (NSString *key in attributeDict) {
         [childDict setValue:[attributeDict objectForKey:key]
-                     forKey:[NSString stringWithFormat:@"@%@", key]];
+                     forKey:[NSString stringWithFormat:@"%@%@", kXMLReaderAttributePrefix, key]];
     }
     
     // If there's already an item for this key, it means we need to create an array
