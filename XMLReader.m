@@ -5,7 +5,7 @@
 #import "XMLReader.h"
 
 NSString *const kXMLReaderTextNodeKey = @"text";
-NSString *const kXMLReaderAttributePrefix = @"@";
+NSString *const kXMLReaderAttributePrefix = @"";
 
 @interface XMLReader (Internal)
 
