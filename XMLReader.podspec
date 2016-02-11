@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name     = 'XMLReader'
-  s.version  = '0.0.2'
+  s.version  = '0.0.2a'
   s.license  = 'MIT'
   s.summary  = 'An NSXMLParser-based XML to NSDictionary converter.'
   s.homepage = 'https://github.com/RestKit/XML-to-NSDictionary'

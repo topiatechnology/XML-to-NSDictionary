@@ -3,6 +3,7 @@
 //
 //  Created by Troy on 9/18/10.
 //  Updated by Antoine Marcadet on 9/23/11.
+//  Modified by John Haager on 2/11/2016 to address a name collision with the text node key.
 //
 
 #import "XMLReader.h"
